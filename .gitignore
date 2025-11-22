@@ -44,7 +44,15 @@ venv.bak/
 data/dataset/
 data/fgvc-aircraft-2013b/
 data/raw/*
-data/processed/*
+# Ignore processed images (too large for git - ~29GB)
+data/processed/*/
+!data/processed/yolo_format/
+data/processed/yolo_format/images/
+data/processed/yolo_format/labels/*.txt
+data/processed/yolo_format/labels/*.cache
+!data/processed/yolo_format/*.yaml
+!data/processed/yolo_format/*.json
+!data/processed/yolo_format/*.txt
 data/*.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
@@ -60,12 +68,21 @@ models/*.h5
 models/*.onnx
 models/*.pb
 !models/.gitkeep
+# Ignore model weights in results (too large)
+results/models_output/*/weights/*.pt
+results/models_output/*/weights/*.pth
+notebooks/*.pt
 
 # Results and Outputs
 results/*.jpg
 results/*.png
 results/*.mp4
 results/*.avi
+# Keep CSV files and visualization directories
+!results/*.csv
+!results/visualizations/
+results/visualizations/*.jpg
+results/visualizations/*.png
 !results/.gitkeep
 
 # Logs
