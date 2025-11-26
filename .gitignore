@@ -68,7 +68,10 @@ models/*.h5
 models/*.onnx
 models/*.pb
 !models/.gitkeep
-# Ignore model weights in results (too large)
+# Allow model weights in results (sizes are reasonable: 6-43MB)
+# results/model_*_output/*/weights/*.pt  # Commented out to allow pushing model weights
+# results/model_*_output/*/weights/*.pth
+# Still ignore old models_output path if it exists
 results/models_output/*/weights/*.pt
 results/models_output/*/weights/*.pth
 notebooks/*.pt
