@@ -44,4 +44,5 @@ imgaug>=0.4.0
 # Export and Deployment
 onnx>=1.12.0
 onnxruntime>=1.12.0
+gradio>=4.0.0
 
