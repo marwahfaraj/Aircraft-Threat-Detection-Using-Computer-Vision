@@ -303,7 +303,7 @@ with gr.Blocks(title="Aircraft Threat Detection") as app:
         if img is None:
             return None
         try:
-            return process_frame(img)
+        return process_frame(img)
         except Exception as e:
             print(f"Error processing image: {e}")
             return None
@@ -387,7 +387,7 @@ if __name__ == "__main__":
     
     for attempt in range(max_attempts):
         try:
-            app.launch(
+    app.launch(
                 server_name=GRADIO_SERVER_NAME,
                 server_port=port,
                 share=GRADIO_SHARE,
