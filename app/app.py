@@ -174,58 +174,169 @@ def get_video_frame():
         return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
 
-# Create Gradio interface
-with gr.Blocks(title="Aircraft Threat Detection") as app:
-    gr.Markdown(
-        """
-        # 🛩️ Aircraft Threat Detection System
-        
-        **Real-time video detection** using YOLOv8s. Point your webcam at aircraft (or toy aircraft) 
-        to detect and classify them as threats with live bounding boxes.
-        
-        **Features:**
-        - 🎥 Real-time continuous video streaming
-        - 📦 Bounding box visualization
-        - ⚠️ Threat classification
-        - 🏷️ Aircraft type identification
-        """
-    )
+# Create Gradio interface with custom theme
+custom_theme = gr.themes.Base(
+    primary_hue="blue",
+    secondary_hue="slate",
+    neutral_hue="slate",
+    font=gr.themes.GoogleFont("Inter"),
+).set(
+    body_background_fill="#f8fafc",
+    body_background_fill_dark="#0f172a",
+    button_primary_background_fill="#2563eb",
+    button_primary_background_fill_hover="#1d4ed8",
+    button_primary_text_color="white",
+    block_title_text_color="#1e293b",
+    block_label_text_color="#475569",
+    input_background_fill="white",
+)
+
+# Create custom CSS for modern look
+custom_css = """
+#header {
+    text-align: center;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    padding: 2rem;
+    border-radius: 10px;
+    color: white;
+    margin-bottom: 2rem;
+}
+#header h1 {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+#header p {
+    color: #e0f2fe;
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+.feature-box {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+}
+#logo-img {
+    max-width: 400px;
+    margin: 1rem auto;
+    display: block;
+    border-radius: 10px;
+}
+"""
+
+with gr.Blocks(title="Aircraft Threat Detection", theme=custom_theme, css=custom_css) as app:
+    # Header with logo
+    with gr.Row(elem_id="header"):
+        gr.Markdown(
+            """
+            # ✈️ Aircraft Threat Detection System
+            **Real-Time Detection Using YOLOv8s Deep Learning**
+            
+            Advanced computer vision system for identifying and classifying aircraft threats
+            """
+        )
+    
+    # Add logo image if exists
+    logo_path = PROJECT_ROOT / "aircraft_threat_detect.png"
+    if logo_path.exists():
+        gr.Image(str(logo_path), label=None, show_label=False, elem_id="logo-img", container=False)
     
     with gr.Row():
-        with gr.Column():
-            gr.Markdown("### 🎥 Live Video Detection")
-            video_display = gr.Image(label="Live Detection Feed", type="numpy")
+        # Left Column - Video Detection
+        with gr.Column(scale=2):
+            gr.Markdown("### 🎥 Live Video Detection", elem_classes="feature-box")
+            video_display = gr.Image(
+                label="Live Detection Feed", 
+                type="numpy",
+                height=480,
+                show_label=True
+            )
             
             with gr.Row():
-                start_btn = gr.Button("▶️ Start Video", variant="primary", size="lg")
-                stop_btn = gr.Button("⏹️ Stop Video", variant="stop", size="lg")
+                start_btn = gr.Button(
+                    "▶️ Start Video Detection", 
+                    variant="primary", 
+                    size="lg",
+                    scale=2
+                )
+                stop_btn = gr.Button(
+                    "⏹️ Stop", 
+                    variant="stop", 
+                    size="lg",
+                    scale=1
+                )
             
-            status = gr.Textbox(label="Status", value="Ready. Click 'Start Video' to begin.", interactive=False)
+            status = gr.Textbox(
+                label="System Status", 
+                value="🟢 Ready - Click 'Start Video Detection' to begin",
+                interactive=False,
+                show_label=True
+            )
             
             gr.Markdown("---")
-            gr.Markdown("### 📷 Or Use Static Image")
-            image_input = gr.Image(label="Upload Image", type="numpy")
-            detect_btn = gr.Button("🔍 Detect from Image", variant="primary")
+            gr.Markdown("### 📷 Static Image Upload", elem_classes="feature-box")
+            image_input = gr.Image(
+                label="Upload Aircraft Image", 
+                type="numpy",
+                height=300
+            )
+            detect_btn = gr.Button(
+                "🔍 Analyze Image", 
+                variant="primary",
+                size="lg"
+            )
         
-        with gr.Column():
-            gr.Markdown("### 📊 Detection Info")
+        # Right Column - Information Panel
+        with gr.Column(scale=1):
+            gr.Markdown("### 📋 Instructions", elem_classes="feature-box")
             gr.Markdown(
                 """
-                **How to Use:**
-                1. Click "▶️ Start Video" to begin continuous live detection
-                2. Point your webcam at a toy aircraft
-                3. Video will stream automatically - no refresh needed!
-                4. Click "⏹️ Stop Video" when done
+                **Live Video Mode:**
+                1. Click **Start Video Detection**
+                2. Point webcam at aircraft
+                3. View real-time detections
+                4. Click **Stop** when finished
                 
-                **Detection Legend:**
-                - **Red boxes**: Threat detected (military aircraft)
-                - **Yellow boxes**: Safe aircraft (commercial)
-                - **Confidence scores** shown for each detection
+                **Image Upload Mode:**
+                1. Upload aircraft image
+                2. Click **Analyze Image**
+                3. View detection results
+                """
+            )
+            
+            gr.Markdown("### 🎯 Detection Legend", elem_classes="feature-box")
+            gr.Markdown(
+                """
+                🔴 **Red Box** = Threat Detected  
+                (Military aircraft)
                 
-                **Model Performance:**
-                - Trained on 49,482 aircraft images
-                - 195 different aircraft types
-                - Best model: 67.1% mAP@0.5
+                🟡 **Yellow Box** = Safe Aircraft  
+                (Commercial aircraft)
+                
+                Each detection shows:
+                - Aircraft type
+                - Confidence score
+                - Threat status
+                """
+            )
+            
+            gr.Markdown("### 📊 Model Details", elem_classes="feature-box")
+            gr.Markdown(
+                """
+                **Architecture:** YOLOv8s  
+                **Training Data:** 49,482 images  
+                **Aircraft Types:** 195 classes  
+                **Accuracy:** 67.1% mAP@0.5  
+                **Speed:** ~30 FPS real-time
+                
+                **Categories:**
+                - Commercial aircraft
+                - Military fighters
+                - Bombers & transport
+                - Helicopters & UAVs
                 """
             )
     
@@ -312,15 +423,14 @@ with gr.Blocks(title="Aircraft Threat Detection") as app:
         outputs=video_display
     )
     
+    # Footer
     gr.Markdown(
         """
         ---
-        ### Model Information:
-        - **Model**: YOLOv8s (Small) - Augmented Training
-        - **Classes**: 195 aircraft types (commercial + military)
-        - **Confidence Threshold**: 0.25
-        - **Performance**: 67.1% mAP@0.5 on test set
-        - **Speed**: ~30 FPS real-time processing
+        <div style='text-align: center; color: #64748b; padding: 1rem;'>
+        <p><strong>Aircraft Threat Detection System</strong> | CS 521 - Computer Vision | University of San Diego</p>
+        <p>Powered by YOLOv8s Deep Learning Model | Real-Time Object Detection</p>
+        </div>
         """
     )
 
