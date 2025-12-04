@@ -19,7 +19,7 @@ CLASSES_FILE = PROJECT_ROOT / "data/processed/yolo_format/classes.txt"
 CLASS_MAPPING_FILE = PROJECT_ROOT / "data/processed/yolo_format/class_mapping.json"
 
 # Detection Configuration
-CONFIDENCE_THRESHOLD = 0.25  # Minimum confidence for detection
+CONFIDENCE_THRESHOLD = 0.35  # Minimum confidence for detection (increased for stability)
 IOU_THRESHOLD = 0.45  # IoU threshold for NMS
 
 # Threat Classification

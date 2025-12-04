@@ -174,80 +174,37 @@ def get_video_frame():
         return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
 
-# Create Gradio interface with custom theme
-custom_theme = gr.themes.Base(
-    primary_hue="blue",
-    secondary_hue="slate",
-    neutral_hue="slate",
-    font=gr.themes.GoogleFont("Inter"),
-).set(
-    body_background_fill="#f8fafc",
-    body_background_fill_dark="#0f172a",
-    button_primary_background_fill="#2563eb",
-    button_primary_background_fill_hover="#1d4ed8",
-    button_primary_text_color="white",
-    block_title_text_color="#1e293b",
-    block_label_text_color="#475569",
-    input_background_fill="white",
-)
-
-# Create custom CSS for modern look
-custom_css = """
-#header {
-    text-align: center;
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-    padding: 2rem;
-    border-radius: 10px;
-    color: white;
-    margin-bottom: 2rem;
-}
-#header h1 {
-    color: white;
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin: 0;
-}
-#header p {
-    color: #e0f2fe;
-    font-size: 1.1rem;
-    margin-top: 0.5rem;
-}
-.feature-box {
-    background: white;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 0.5rem 0;
-}
-#logo-img {
-    max-width: 400px;
-    margin: 1rem auto;
-    display: block;
-    border-radius: 10px;
-}
-"""
-
-with gr.Blocks(title="Aircraft Threat Detection", theme=custom_theme, css=custom_css) as app:
+# Create Gradio interface
+with gr.Blocks(title="Aircraft Threat Detection") as app:
     # Header with logo
-    with gr.Row(elem_id="header"):
-        gr.Markdown(
-            """
-            # ✈️ Aircraft Threat Detection System
-            **Real-Time Detection Using YOLOv8s Deep Learning**
-            
-            Advanced computer vision system for identifying and classifying aircraft threats
-            """
-        )
+    gr.HTML("""
+        <div style='text-align: center; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); 
+                    padding: 2rem; border-radius: 10px; margin-bottom: 2rem;'>
+            <h1 style='color: white; font-size: 2.5rem; margin: 0;'>✈️ Aircraft Threat Detection System</h1>
+            <p style='color: #e0f2fe; font-size: 1.1rem; margin-top: 0.5rem;'>
+                Real-Time Detection Using YOLOv8s Deep Learning
+            </p>
+            <p style='color: #bfdbfe; font-size: 0.95rem;'>
+                Advanced computer vision system for identifying and classifying aircraft threats
+            </p>
+        </div>
+    """)
     
-    # Add logo image if exists
-    logo_path = PROJECT_ROOT / "aircraft_threat_detect.png"
+    # Add logo image if exists (centered and smaller, no container)
+    logo_path = Path(__file__).parent / "aircraft_threat_detection_system.png"
     if logo_path.exists():
-        gr.Image(str(logo_path), label=None, show_label=False, elem_id="logo-img", container=False)
+        with gr.Row():
+            with gr.Column(scale=1):
+                pass
+            with gr.Column(scale=2):
+                gr.Image(str(logo_path), label=None, show_label=False, height=150, container=False)
+            with gr.Column(scale=1):
+                pass
     
     with gr.Row():
         # Left Column - Video Detection
         with gr.Column(scale=2):
-            gr.Markdown("### 🎥 Live Video Detection", elem_classes="feature-box")
+            gr.HTML("<h3 style='color: #1e3a8a;'>🎥 Live Video Detection</h3>")
             video_display = gr.Image(
                 label="Live Detection Feed", 
                 type="numpy",
@@ -255,16 +212,35 @@ with gr.Blocks(title="Aircraft Threat Detection", theme=custom_theme, css=custom
                 show_label=True
             )
             
+            gr.HTML("""
+                <style>
+                    .blue-button { 
+                        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important; 
+                        color: white !important;
+                        border: none !important;
+                        padding: 0.75rem 1.5rem !important;
+                        border-radius: 6px !important;
+                        font-size: 1.1rem !important;
+                        font-weight: 600 !important;
+                        cursor: pointer !important;
+                        width: 100% !important;
+                        margin: 0.25rem 0 !important;
+                    }
+                    .blue-button:hover {
+                        opacity: 0.9 !important;
+                    }
+                </style>
+            """)
             with gr.Row():
                 start_btn = gr.Button(
                     "▶️ Start Video Detection", 
-                    variant="primary", 
+                    elem_classes="blue-button",
                     size="lg",
                     scale=2
                 )
                 stop_btn = gr.Button(
                     "⏹️ Stop", 
-                    variant="stop", 
+                    elem_classes="blue-button",
                     size="lg",
                     scale=1
                 )
@@ -277,7 +253,7 @@ with gr.Blocks(title="Aircraft Threat Detection", theme=custom_theme, css=custom
             )
             
             gr.Markdown("---")
-            gr.Markdown("### 📷 Static Image Upload", elem_classes="feature-box")
+            gr.HTML("<h3 style='color: #1e3a8a;'>📷 Static Image Upload</h3>")
             image_input = gr.Image(
                 label="Upload Aircraft Image", 
                 type="numpy",
@@ -285,13 +261,35 @@ with gr.Blocks(title="Aircraft Threat Detection", theme=custom_theme, css=custom
             )
             detect_btn = gr.Button(
                 "🔍 Analyze Image", 
-                variant="primary",
+                elem_classes="blue-button",
                 size="lg"
             )
+            
+            gr.Markdown("---")
+            gr.HTML("<h3 style='color: #1e3a8a;'>🎬 Video Upload & Detection</h3>")
+            gr.Markdown("""
+                **Instructions:**
+                1. Upload a video file
+                2. Click 'Process Video' button
+                3. Wait for processing (may take time for long videos)
+                4. Processed video will appear below with detections
+            """)
+            video_input = gr.Video(label="Upload Video File")
+            process_video_btn = gr.Button(
+                "🎥 Process Video", 
+                elem_classes="blue-button",
+                size="lg"
+            )
+            video_status = gr.Textbox(
+                label="Processing Status", 
+                value="Upload a video and click 'Process Video'",
+                interactive=False
+            )
+            video_output = gr.Video(label="Processed Video with Detections", width=640, height=480)
         
         # Right Column - Information Panel
         with gr.Column(scale=1):
-            gr.Markdown("### 📋 Instructions", elem_classes="feature-box")
+            gr.HTML("<h3 style='color: #1e3a8a;'>📋 Instructions</h3>")
             gr.Markdown(
                 """
                 **Live Video Mode:**
@@ -307,7 +305,7 @@ with gr.Blocks(title="Aircraft Threat Detection", theme=custom_theme, css=custom
                 """
             )
             
-            gr.Markdown("### 🎯 Detection Legend", elem_classes="feature-box")
+            gr.HTML("<h3 style='color: #1e3a8a;'>🎯 Detection Legend</h3>")
             gr.Markdown(
                 """
                 🔴 **Red Box** = Threat Detected  
@@ -323,7 +321,7 @@ with gr.Blocks(title="Aircraft Threat Detection", theme=custom_theme, css=custom
                 """
             )
             
-            gr.Markdown("### 📊 Model Details", elem_classes="feature-box")
+            gr.HTML("<h3 style='color: #1e3a8a;'>📊 Model Details</h3>")
             gr.Markdown(
                 """
                 **Architecture:** YOLOv8s  
@@ -349,6 +347,88 @@ with gr.Blocks(title="Aircraft Threat Detection", theme=custom_theme, css=custom
         except Exception as e:
             print(f"Error processing image: {e}")
             return None
+    
+    # Process uploaded video with temporal smoothing
+    def process_video(video_path):
+        """Process video file frame-by-frame with aircraft detection and smoothing"""
+        if video_path is None:
+            return "❌ Please upload a video first", None
+        
+        try:
+            import tempfile
+            
+            status_msg = f"🎬 Starting video processing..."
+            print(f"📹 Processing video: {video_path}")
+            
+            # Open input video
+            cap = cv2.VideoCapture(video_path)
+            if not cap.isOpened():
+                print("❌ Could not open video file")
+                return "❌ Could not open video file. Try a different format.", None
+            
+            # Get video properties
+            fps = int(cap.get(cv2.CAP_PROP_FPS))
+            width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            
+            print(f"Video: {width}x{height}, {fps} FPS, {total_frames} frames")
+            status_msg = f"📊 Video: {width}x{height}, {fps} FPS, {total_frames} frames\n⏳ Processing..."
+            
+            # Create temporary output video file with browser-compatible codec
+            output_path = tempfile.mktemp(suffix='.mp4')
+            
+            # Try H.264 codec (most browser-compatible)
+            fourcc = cv2.VideoWriter_fourcc(*'avc1')  # H.264 codec
+            out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+            
+            # Fallback to mp4v if avc1 doesn't work
+            if not out.isOpened():
+                fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+            
+            if not out.isOpened():
+                return "❌ Could not create output video", None
+            
+            frame_count = 0
+            detections_found = 0
+            
+            # Temporal smoothing - keep track of recent detections
+            detection_history = []
+            history_size = 5  # Keep last 5 frames
+            
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                
+                # Process frame with detection
+                processed_frame = process_frame(frame)
+                
+                # Convert RGB back to BGR for video writer
+                processed_bgr = cv2.cvtColor(processed_frame, cv2.COLOR_RGB2BGR)
+                out.write(processed_bgr)
+                
+                frame_count += 1
+                if frame_count % 30 == 0:
+                    progress = (frame_count / total_frames) * 100
+                    print(f"Progress: {progress:.1f}% ({frame_count}/{total_frames} frames)")
+            
+            # Release resources
+            cap.release()
+            out.release()
+            
+            status_msg = f"✅ Processing complete!\n📹 Processed {frame_count} frames\n🎯 Video ready with detections"
+            print(f"✅ Video processing complete! Saved to: {output_path}")
+            
+            return status_msg, output_path
+            
+        except Exception as e:
+            error_msg = f"❌ Error: {str(e)}"
+            print(f"❌ Error processing video: {e}")
+            import traceback
+            traceback.print_exc()
+            return error_msg, None
     
     # Start video streaming
     def start_stream():
@@ -423,16 +503,21 @@ with gr.Blocks(title="Aircraft Threat Detection", theme=custom_theme, css=custom
         outputs=video_display
     )
     
-    # Footer
-    gr.Markdown(
-        """
-        ---
-        <div style='text-align: center; color: #64748b; padding: 1rem;'>
-        <p><strong>Aircraft Threat Detection System</strong> | CS 521 - Computer Vision | University of San Diego</p>
-        <p>Powered by YOLOv8s Deep Learning Model | Real-Time Object Detection</p>
-        </div>
-        """
+    process_video_btn.click(
+        fn=process_video,
+        inputs=video_input,
+        outputs=[video_status, video_output]
     )
+    
+    # Footer
+    gr.HTML("""
+        <hr style='margin: 2rem 0; border: none; border-top: 2px solid #e2e8f0;'>
+        <div style='text-align: center; color: #64748b; padding: 1rem;'>
+            <p style='margin: 0.5rem 0;'><strong style='color: #1e3a8a;'>Aircraft Threat Detection System</strong></p>
+            <p style='margin: 0.5rem 0;'>CS 521 - Computer Vision | University of San Diego</p>
+            <p style='margin: 0.5rem 0; font-size: 0.9rem;'>Powered by YOLOv8s Deep Learning Model</p>
+        </div>
+    """)
 
 if __name__ == "__main__":
     print("\n" + "="*70)

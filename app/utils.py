@@ -26,25 +26,79 @@ def is_threat(aircraft_class):
         aircraft_class: Name of the aircraft class
     
     Returns:
-        bool: True if threat, False otherwise
-    """
-    # Option 1: All aircraft are threats
-    return True
+        bool: True if threat (military aircraft), False otherwise (commercial)
     
-    # Option 2: Only military aircraft are threats (uncomment to use)
-    # military_keywords = [
-    #     'F-', 'F16', 'F18', 'F22', 'F35',  # Fighters
-    #     'B-', 'B1', 'B2', 'B52',  # Bombers
-    #     'A-10', 'AH', 'AH64',  # Attack helicopters
-    #     'CH', 'UH',  # Transport helicopters
-    #     'Mi', 'Su', 'Mig',  # Russian aircraft
-    #     'Eurofighter', 'Rafale', 'Tornado',  # European fighters
-    #     'J10', 'J20', 'J35',  # Chinese fighters
-    #     'KC135', 'C-130', 'C17', 'C5',  # Military transport
-    #     'MQ', 'RQ', 'TB2',  # Drones
-    #     'SR71', 'U2',  # Reconnaissance
-    # ]
-    # return any(keyword in aircraft_class for keyword in military_keywords)
+    Note: The FGVC dataset contains military aircraft that were originally labeled
+    as commercial. This function correctly identifies them as military threats
+    based on aircraft type keywords, regardless of original dataset labels.
+    """
+    # Military aircraft keywords - these are threats
+    # Comprehensive list covering all 195 classes in our dataset
+    military_keywords = [
+        # US/NATO Fighters
+        'F-', 'F16', 'F18', 'F22', 'F35', 'F14', 'F15', 'F4', 'F2', 'F117',
+        'F-16A', 'F/A-18',  # FGVC format
+        
+        # Bombers (US, Russian, Chinese)
+        'B-', 'B1', 'B2', 'B21', 'B52',
+        'Tu160', 'Tu22M', 'Tu95', 'Tu-160', 'Tu-22', 'Tu-95',  # Russian bombers
+        'H6',  # Chinese bomber
+        
+        # Attack aircraft
+        'A10', 'A-10', 'AV8B', 'A-7',
+        'EMB314',  # Super Tucano (attack/trainer)
+        
+        # Attack helicopters
+        'AH', 'AH64', 'Mi24', 'Mi28', 'Ka52', 'WZ', 'Z10', 'Z19',
+        'WZ10', 'WZ7', 'WZ9',  # Chinese attack helicopters
+        
+        # Military helicopters
+        'CH', 'UH', 'CH47', 'CH53', 'UH60', 'Mi8', 'Mi26', 'Ka27', 'V22', 'V280',
+        
+        # Russian aircraft
+        'Mi', 'Su', 'Mig',
+        'Su24', 'Su25', 'Su34', 'Su47', 'Su57',
+        'Mig29', 'Mig31',
+        'Il-76', 'Il76',  # Russian transport
+        
+        # European fighters
+        'Eurofighter', 'Rafale', 'Tornado', 'EF2000', 'JAS39',
+        'Mirage', 'Mirage2000',  # French fighter
+        
+        # Asian fighters
+        'J10', 'J20', 'J35', 'J36', 'J50', 'JF17', 'JH7', 'FCK1', 'KF21', 'KAAN',
+        'Tejas',  # Indian fighter
+        
+        # Military transport
+        'KC135', 'KC-135', 'C-130', 'C130', 'C17', 'C5', 'C1', 'C2', 'C390', 'A400M',
+        'C-47',  # WWII transport
+        'An-12', 'An72', 'An124', 'An22', 'An225',  # Antonov military transports
+        'Y20',  # Chinese transport
+        
+        # Drones/UAVs
+        'MQ', 'RQ', 'TB', 'TB001', 'TB2', 'XQ58',
+        'MQ9', 'MQ25', 'RQ4',
+        'AKINCI', 'Bayraktar',  # Turkish UAVs
+        
+        # Reconnaissance
+        'SR71', 'U2', 'US2',
+        
+        # AWACS/Maritime patrol
+        'E2', 'E7', 'KJ600', 'P3',
+        
+        # Historic military
+        'Spitfire', 'Vulcan',
+        
+        # Experimental
+        'X29', 'X32', 'XB70', 'YF23',
+        
+        # Trainers that are military
+        'Hawk', 'Hawk T1',
+    ]
+    
+    # Check if aircraft class contains any military keyword
+    aircraft_upper = aircraft_class.upper()
+    return any(keyword.upper() in aircraft_upper for keyword in military_keywords)
 
 
 def draw_detection(img, x1, y1, x2, y2, aircraft_type, confidence, is_threat_detected):

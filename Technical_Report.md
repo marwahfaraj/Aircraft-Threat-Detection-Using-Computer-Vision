@@ -159,6 +159,7 @@ Several challenges were identified during data exploration:
 3. **Scale Variation**: Aircraft appear at different scales, from close-up to distant views
 4. **Occlusions**: Some images contain partial occlusions or multiple aircraft
 5. **Class Imbalance**: Significant variation in samples per class (ranging from tens to thousands)
+6. **Cross-Dataset Labeling Inconsistencies**: The FGVC-Aircraft dataset, originally designed for fine-grained commercial aircraft classification, contains several military aircraft types (e.g., F-16A/B, Spitfire, Eurofighter Typhoon) that were not explicitly labeled as military. This creates potential naming conflicts when combining with the dedicated Military Aircraft dataset (e.g., "F-16A/B" vs. "F16" representing the same aircraft). These inconsistencies were discovered during post-hoc analysis and addressed at the application layer through keyword-based threat classification, though future work should address this through dataset relabeling and retraining (see Section 7.3).
 
 These challenges motivated our preprocessing and augmentation strategies described in Section 4.
 
@@ -567,21 +568,36 @@ Our work has several limitations that should be acknowledged:
 - No temporal video data (only static images)
 - Class imbalance (80% military, 20% commercial) may bias predictions
 
-**2. Model Limitations:**
+**2. Dataset Labeling Inconsistencies:**
+
+A significant limitation discovered during post-hoc analysis involves labeling inconsistencies between the source datasets. The FGVC-Aircraft dataset (Maji et al., 2013) contains several military aircraft variants (e.g., F-16A/B, Spitfire, Eurofighter Typhoon) that were originally intended for fine-grained commercial aircraft classification. When combining this dataset with the dedicated Military Aircraft Dataset, we inherited these labeling ambiguities:
+
+- **Naming convention conflicts**: The same aircraft type may appear with different labels (e.g., "F-16A/B" in FGVC vs. "F16" in the military dataset), potentially creating redundant or confusing classes for the model.
+- **Category overlap**: Military aircraft in FGVC were not explicitly distinguished from commercial aircraft, leading to potential class confusion during training.
+- **Implications for threat detection**: The model learns aircraft type identification, but the original dataset category labels (commercial vs. military) do not align with actual aircraft designations.
+
+This limitation was addressed at the application level through a comprehensive keyword-based threat classification system that correctly identifies military aircraft regardless of source dataset labeling. However, a more rigorous solution would involve:
+1. Manual relabeling of military aircraft in the FGVC subset
+2. Standardizing naming conventions across datasets (e.g., "F-16A/B" → "F-16")
+3. Retraining the model with corrected annotations
+
+This finding highlights the importance of thorough data validation when combining multiple datasets—a common challenge in real-world computer vision projects (Sun et al., 2017)
+
+**3. Model Limitations:**
 - Struggles with very small aircraft (<32×32 pixels), a common challenge in object detection (Liu et al., 2016)
 - Limited robustness to extreme viewing angles
 - Difficulty distinguishing visually similar variants, inherent to fine-grained classification tasks (Maji et al., 2013)
 - No explicit handling of aircraft state (e.g., landing gear position)
 - Inference speed on CPU (~28 FPS) may be insufficient for some real-time applications
 
-**3. Threat Classification:**
+**4. Threat Classification:**
 - Current binary classification (threat/safe) is overly simplistic
 - Does not consider context (location, flight path, altitude)
 - No temporal analysis of aircraft behavior
 - Requires manual rule definition rather than learned classification
 - No confidence calibration for threat assessment
 
-**4. Deployment Constraints:**
+**5. Deployment Constraints:**
 - Currently requires local installation
 - Limited to webcam input in demo application
 - No cloud-based inference for mobile access
@@ -636,6 +652,8 @@ Several directions could extend this work:
 - Explore ensemble methods combining multiple models
 
 **2. Data Enhancements:**
+- **Dataset label reconciliation**: Audit and correct labeling inconsistencies between FGVC and Military Aircraft datasets, particularly for military aircraft that appear in both sources with different naming conventions
+- **Class consolidation**: Merge duplicate classes (e.g., "F-16A/B" and "F16") to reduce model confusion and improve classification accuracy
 - Collect additional data for underrepresented classes
 - Augment dataset with synthetic data generation
 - Include temporal video sequences for tracking
