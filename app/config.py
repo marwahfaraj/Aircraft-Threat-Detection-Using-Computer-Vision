@@ -19,7 +19,9 @@ CLASSES_FILE = PROJECT_ROOT / "data/processed/yolo_format/classes.txt"
 CLASS_MAPPING_FILE = PROJECT_ROOT / "data/processed/yolo_format/class_mapping.json"
 
 # Detection Configuration
-CONFIDENCE_THRESHOLD = 0.35  # Minimum confidence for detection (increased for stability)
+CONFIDENCE_THRESHOLD = (
+    0.35  # Minimum confidence for detection (increased for stability)
+)
 IOU_THRESHOLD = 0.45  # IoU threshold for NMS
 
 # Threat Classification
@@ -38,4 +40,3 @@ FONT_THICKNESS = 2
 GRADIO_SERVER_NAME = "127.0.0.1"  # Use localhost instead of 0.0.0.0
 GRADIO_SERVER_PORT = 7860  # Change to 7861, 7862, etc. if port is busy
 GRADIO_SHARE = False  # Set to True for public link
-
